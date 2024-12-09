@@ -31,3 +31,6 @@ bin/
 
 ### files ###
 *.csv
+
+
+*.class
