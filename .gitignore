@@ -27,3 +27,8 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### files ###
+admin.csv
+members.csv
+coach.csv

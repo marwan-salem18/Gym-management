@@ -1,19 +1,17 @@
 import java.io.*;
+import java.util.Objects;
+
 public class UserManipulations {
     protected static void AddUser(String usertype,String[] data) {
         String[] header;
-        if (usertype == "member"){
-            header = new String[]{"ID", "Username", "Password","endDate","Schedule","RenewPrice","coach"};
-        }
-        else if (usertype == "coach"){
-            header = new String[]{"ID", "Username", "Password"};
-        }
-        else if (usertype == "admin"){
-            header = new String[]{"ID", "Username", "Password"};
-        }
-        else {
-            System.out.println("Not vaild");
-            return;
+        switch (usertype) {
+            case "member" ->
+                    header = new String[]{"ID", "Username", "Password", "endDate", "Schedule", "RenewPrice", "coach"};
+            case "coach", "admin" -> header = new String[]{"ID", "Username", "Password"};
+            case null, default -> {
+                System.out.println("Not valid");
+                return;
+            }
         }
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(String.format("%s.csv", usertype), true))) {
             // Check if file is empty (write header only once)
@@ -28,9 +26,17 @@ public class UserManipulations {
                 bw.write(",");
             }
             else {
-                String id = (readLastLine())[0];
-                bw.write(id + 1);
-                bw.write(",");
+                try {
+                    int id = Integer.parseInt((Objects.requireNonNull(readLastLine(usertype)))[0]);
+                    id = id + 1;
+                    bw.write(String.format("%d", id));
+                    bw.write(",");
+                }
+                catch (NumberFormatException e){
+                    System.out.println("error reading data");
+                    return;
+                }
+
             }
             // Write data
             for (String cell : data) {
@@ -39,7 +45,7 @@ public class UserManipulations {
             }
             bw.newLine();
 
-            System.out.println("Data appended to " + "users.csv");
+            System.out.printf("%s.csv%n", usertype);
 
         } catch (Exception e) {
             System.err.println("Error writing to CSV file: " + e.getMessage());
@@ -50,9 +56,9 @@ public class UserManipulations {
     }
     public static void replace(String[] data){
     }
-    private static String[] readLastLine(){
+    private static String[] readLastLine(String usertype){
         String lastLine = "";
-        try (BufferedReader br = new BufferedReader(new FileReader("users.csv"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(String.format("%s.csv", usertype)))) {
             String currentLine;
             while ((currentLine = br.readLine()) != null) {
                 lastLine = currentLine;
@@ -68,11 +74,10 @@ public class UserManipulations {
         return file.length() == 0;
     }
     private static String[] lookup(String[] dataFields,String[] data){
-
         try (BufferedReader br = new BufferedReader(new FileReader("users.csv"))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] values = line.split("و");
+                String[] values = line.split(",");
                 if (data[0].equals(values[1]) && data[1].equals(values[2])){
                     return values;
                 }
