@@ -1,12 +1,11 @@
 import java.io.*;
 import java.nio.file.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class UserManipulations {
     // adds a new user
-    protected static void AddUser(String usertype,String[] data) {
+    public static void AddHeader(String usertype) {
         String[] header;
         //check usertype
         switch (usertype) {
@@ -20,20 +19,47 @@ public class UserManipulations {
         }
         //open a new writer
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(String.format("%s.csv", usertype), true))) {
+            
+            for (String field : header) {
+                bw.write(field);
+                bw.write(",");
+            }
+            bw.newLine();
+            bw.write("1");
+            bw.write(",");
+            bw.newLine();
+        
+        } catch (Exception e) {
+            System.err.println("Error writing to CSV file: " + e.getMessage());
+        }
+    }
+
+    // initializes all our csv files with the headers and the first id 
+    // SHOULD ALWAYS BE IN THE BEGENING OF YOUR MAIN FUNCTION
+    public static void initailizeFiles()
+    {
+        String[] validTypes = {"admin", "member", "coach"};
+        for (String usertype : validTypes)
+        {
+            boolean fileEmpty = isFileEmpty(usertype);
+            if (fileEmpty) {
+                AddHeader(usertype);
+            }
+        }
+    }
+        
+    protected static void AddUser(String usertype,String[] data) {
+
+        //open a new writer
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(String.format("%s.csv", usertype), true))) {
             // Check if file is empty (write header only once)
             boolean fileEmpty = isFileEmpty(usertype);
             if (fileEmpty) {
-                for (String field : header) {
-                    bw.write(field);
-                    bw.write(",");
-                }
-                bw.newLine();
-                bw.write("1");
-                bw.write(",");
+                System.out.println("please initialize headers");
             }
             else {
                 //checks uniqueness
-                if (isUnique(usertype, data[0])){
+                if (!isUnique(usertype, data[0])){
                     System.out.println("username already used");
                     return;
                 }
@@ -61,11 +87,17 @@ public class UserManipulations {
             System.err.println("Error writing to CSV file: " + e.getMessage());
         }
     }
+
+
     public static String[] Login(String [] data){
         return null;
     }
+
+
     public static void update(String usertype,String[] data){
     }
+
+
     private static String[] readLastLine(String usertype){
         String lastLine = "";
         //opens a new reader
@@ -81,12 +113,16 @@ public class UserManipulations {
             return null;
         }
     }
+
+
     // Helper method to check if file is empty
     private static boolean isFileEmpty(String usertype) {
         //checks if the file is empty
         java.io.File file = new java.io.File(String.format("%s.csv", usertype));
         return file.length() == 0;
     }
+
+
     public static String[] lookup(String usertype,String Username){
         //opens a new reader
         try (BufferedReader br = new BufferedReader(new FileReader(String.format("%s.csv", usertype)))) {
@@ -94,9 +130,16 @@ public class UserManipulations {
             while ((line = br.readLine()) != null) {
                 //turns the file values into an array
                 String[] values = line.split(",");
-                //checks if username are equal
-                if (Username.equals(values[1])){
-                    return values;
+                
+                // the first line of the csv file is always "1," only with no username so if the array is out of bound then just skip to the next line
+                try{
+                    //checks if username are equal
+                    if (Username.equals(values[1])){
+                        return values;
+                    }
+                }
+                catch(Exception ArrayIndexOutOfBoundsException) {
+                    continue;
                 }
             }
         } catch (IOException e) {
@@ -105,6 +148,8 @@ public class UserManipulations {
         }
         return null;
     }
+
+
     public static int lineLookup(String usertype,String Username){
         //opns a new reader
         try (BufferedReader br = new BufferedReader(new FileReader(String.format("%s.csv", usertype)))) {
@@ -125,6 +170,8 @@ public class UserManipulations {
         }
         return 0;
     }
+
+
     public static void updater(String usertype,String[] newContent,int targetLine){
         // Define file path
         Path filePath = Paths.get(String.format("%s.csv", usertype));
@@ -152,7 +199,9 @@ public class UserManipulations {
         }
         System.out.println("Updated file at line " + targetLine);
     }
+
+    
     public static boolean isUnique(String usertype,String username){
-        return lookup(usertype, username) != null;
+        return lookup(usertype, username) == null;
     }
 }
