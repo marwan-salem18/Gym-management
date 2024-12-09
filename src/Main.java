@@ -1,7 +1,8 @@
 public class Main {
     public static void main(String[] args) {
-        String [] data = {"new guy","omg1234"};
-        UserManipulations.AddUser("admin",data);
-        UserManipulations.AddUser("coach",data);
+        String[] data = UserManipulations.lookup("admin","hi");
+        data[2] = "abdallah";
+        int line = UserManipulations.lineLookup("admin","hi");
+        UserManipulations.updater("admin",data,line);
     }
 }
