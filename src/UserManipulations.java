@@ -205,11 +205,17 @@ public class UserManipulations {
         List<String[]> Users = new ArrayList<>();
         String line;
         for (int i = 0; i < 3; i++) {
+            int j = 0;
             String currentUser = usertype[i];
-            try (BufferedReader br = new BufferedReader(new FileReader(String.format("%s.csv", usertype)))) {
+            try (BufferedReader br = new BufferedReader(new FileReader(String.format("%s.csv", currentUser  )))) {
                 while ((line = br.readLine()) != null){
-                    String[] values = line.split(",");
-                    Users.add(values);
+                    if (j > 1){
+                        String[] values = line.split(",");
+                        Users.add(values);
+                    }
+                    else {
+                        j++;
+                    };
                 }
             } catch (IOException e) {
                 System.err.println("Error reading CSV file: " + e.getMessage());
