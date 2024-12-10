@@ -160,9 +160,17 @@ public class UserManipulations {
                 //increase line number and checks the file for it's username
                 linenumber++;
                 String[] values = line.split(",");
-                if (Username.equals(values[1])){
-                    return linenumber;
+
+                // the first line of the csv file is always "1," only with no username so if the array is out of bound then just skip to the next line
+                try{
+                    if (Username.equals(values[1])){
+                        return linenumber;
+                    }
                 }
+                catch(Exception ArrayIndexOutOfBoundsException) {
+                    continue;
+                }
+                
             }
         } catch (IOException e) {
             System.err.println("Error reading CSV file: " + e.getMessage());
