@@ -4,76 +4,113 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class Member extends User {
-    private String endDate;
-    private String schedule;
-    private String renewPrice;
-    private String coach;
-    private String notifications;
+    private String endDate = "null";
+    private String schedule = "null";
+    private String renewPrice = "null";
+    private String coach = "null";
+    private String notifications = "null";
 
     // Constructor for Member with all valuables (probably will never use it)
     public Member(String username, String password, String endDate, String schedule, String renewPrice, String coach, String notifications) 
     {
         super(username, password, "member");
-        this.setEndDate(endDate);
-        this.setSchedule(schedule);
-        this.setRenewPrice(renewPrice);
-        this.setCoach(coach);
-        this.setNotifications(notifications);
+        this.endDate = endDate;
+        this.schedule = schedule;
+        this.renewPrice = renewPrice;
+        this.coach = coach;
+        this.notifications = notifications;
     }
 
     // Constructor for Member with username and password only
     public Member(String username, String password) 
     {
         super(username, password, "member");
-        this.setEndDate("null");
-        this.setSchedule("null");
-        this.setRenewPrice("null");
-        this.setCoach("null");
-        this.setNotifications("null");
+        this.endDate = "null";
+        this.schedule = "null";
+        this.renewPrice = "null";
+        this.coach = "null";
+        this.notifications = "null";
     }
 
     public String getEndDate() 
     {
-        if (endDate.equals("null")) {
-            System.out.println("There is no end date for the member.");
-            return null;
+        if (endDate == null || endDate.equals("null")) {
+            return "null";
         }
+        updateClass();
         return endDate;
     }
 
     public void setEndDate(String endDate) {
+        String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        if (userIsRegistered == null) {
+            return;
+        }
+        if(this.endDate == null || endDate.equals("null"))
+        {
+            updateEndDate("null");
+        }
+        else{
+            updateEndDate(endDate);
+        }
+    }
+
+    public void updateEndDate(String endDate)
+    {
+        // updates user data in the db
+        String[] userdata = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        int line = UserManipulations.lineLookup(this.getUserType(), this.getUsername());
+        userdata[3] = endDate;
+        UserManipulations.updater(this.getUserType(), userdata, line);
+        // updates user data in program
         this.endDate = endDate;
     }
 
     public String getSchedule() 
     {
-        if (schedule.equals("null")) {
-            System.out.println("There is no Schedule for this member");
-            return null;
+        if (schedule == null || schedule.equals("null")) {
+            return "null";
         }
-        return notifications;
+        return schedule;
     }
 
     public void setSchedule(String schedule) 
     {
-        // Append ":" after the notification
-        if (this.schedule == null || this.schedule.equals("null")){
-            this.schedule = schedule + ":";
-        } 
-        else if(schedule.equals("null")){
-            this.schedule = "null";
+        String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        if (userIsRegistered == null) {
+            return;
         }
-        else {
-            this.notifications += schedule + ":";
+        if(this.schedule == null || schedule.equals("null"))
+        {
+            updateSchedule("null");
         }
+        else if(this.schedule.contains(":")){
+            String s0 = this.schedule + schedule + ":";
+            updateSchedule(s0);
+        }
+        else{
+            updateSchedule(schedule + ":");
+        }
+    }
+
+    public void updateSchedule(String schedule)
+    {
+        // updates user data in the db
+        String[] userdata = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        int line = UserManipulations.lineLookup(this.getUserType(), this.getUsername());
+        userdata[4] = schedule;
+        UserManipulations.updater(this.getUserType(), userdata, line);
+        // updates user data in program
+        this.schedule = schedule;
     }
 
     public String[] getScheduleArray() 
     {
         // Split the notifications string by ":"
         if (schedule == null || schedule.equals("null")) {
-            return new String[0];  // Return empty array if no notifications
+            return null;  // Return null if no notifications
         }
+        updateClass();
         return schedule.split(":");
     }
 
@@ -94,68 +131,144 @@ public class Member extends User {
         for (String item : resultList) {
             this.setSchedule(item);
         }
-        //update the CSV file
-        this.updateCSVFile();
     }
 
 
     public String getRenewPrice() 
     {
-        if (renewPrice.equals("null")) {
-            System.out.println("There is no renewal price for the member.");
+        if (renewPrice == null || renewPrice.equals("null")) {
             return "null";
         }
+        updateClass();
         return renewPrice;
     }
 
-    public void setRenewPrice(String renewPrice) 
+    public void setRenewPrice(String renewPrice) {
+        String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        if (userIsRegistered == null) {
+            System.out.println("This Member is not registered");
+            return;
+        }
+        if(this.renewPrice == null || renewPrice.equals("null"))
+        {
+            updateRenewPrice("null");
+        }
+        else{
+            updateRenewPrice(renewPrice);
+        }
+    }
+
+    public void updateRenewPrice(String renewPrice)
     {
+        // updates user data in the db
+        String[] userdata = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        int line = UserManipulations.lineLookup(this.getUserType(), this.getUsername());
+        userdata[5] = renewPrice;
+        UserManipulations.updater(this.getUserType(), userdata, line);
+        // updates user data in program
         this.renewPrice = renewPrice;
     }
 
     public String getCoach() 
     {
-        if (coach.equals("null")) {
+        if (coach == null || coach.equals("null")) {
             System.out.println("There is no coach for the member.");
             return "null";
         }
+        //update the values in the Class
+        updateClass();
         return coach;
     }
+    public void setCoach(String coach) {
+        String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        if (userIsRegistered == null) {
+            System.out.println("This Member is not registered");
+            return;
+        }
+        if(this.coach == null || coach.equals("null"))
+        {
+            updateCoach("null");
+        }
+        else{
+            updateCoach(coach);
+        }
+    }
 
-    public void setCoach(String coach) 
+    public void updateCoach(String coach)
     {
+        // updates user data in the db
+        String[] userdata = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        int line = UserManipulations.lineLookup(this.getUserType(), this.getUsername());
+        userdata[6] = coach;
+        UserManipulations.updater(this.getUserType(), userdata, line);
+        // updates user data in program
         this.coach = coach;
     }
 
+
     public String getNotifications() 
     {
-        if (notifications.equals("null")) {
+        if (notifications == null || notifications.equals("null")) {
             System.out.println("There are no notifications to display.");
             return "null";
         }
+        //update the values in the Class
+        updateClass();
         return notifications;
     }
 
-    public void setNotifications(String notification) 
+    public void setNotifications(String notifications) 
     {
-        // Append ":" after the notification
-        if (notifications == null || notifications.equals("null")) {
-            this.notifications = notification + ":";
-        }else if(notification.equals("null")){
-            this.notifications = "null";
+        String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        if (userIsRegistered == null) {
+            System.out.println("This Coach is not registered");
+            return;
         }
-        else {
-            this.notifications += notification + ":";
+        if(this.notifications == null || notifications.equals("null"))
+        {
+            updateNotifications("null");
         }
+        else if(this.notifications.contains(":")){
+            String s0 = this.notifications + notifications + ":";
+            updateNotifications(s0);
+        }
+        else{
+            updateNotifications(notifications + ":");
+        }
+    }
+
+    public void updateNotifications(String notifications)
+    {
+        // updates user data in the db
+        String[] userdata = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        int line = UserManipulations.lineLookup(this.getUserType(), this.getUsername());
+        userdata[7] = notifications;
+        UserManipulations.updater(this.getUserType(), userdata, line);
+        // updates user data in program
+        this.notifications = notifications;
     }
 
     public String[] getNotificationsArray() 
     {
         // Split the notifications string by ":"
         if (notifications == null || notifications.equals("null")) {
-            return new String[0];  // Return empty array if no notifications
+            return null;  // Return empty array if no notifications
         }
         return notifications.split(":");
+    }
+
+    public void printNotifications()
+    {
+        if(getNotificationsArray() == null)
+        {
+            System.out.println("No notifications");
+        }
+        else
+        {
+            for (String noti : getNotificationsArray()) {
+                System.out.println(noti);
+            }
+        }
     }
 
     // Delete a notification from the notifications List
@@ -175,8 +288,8 @@ public class Member extends User {
         for (String item : resultList) {
             this.setNotifications(item);
         }
-        //update the CSV file
-        this.updateCSVFile();
+        //update the values in Class 
+        this.updateClass();
     }
 
     @Override
@@ -215,6 +328,13 @@ public class Member extends User {
     @Override
     public void login() 
     {
+        // checks if user exists
+        String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        if (userIsRegistered == null) {
+            System.out.println("user is not registered");
+            return;
+        }
+
         // checks if there's a logged in account in all users
         if (super.getSomeoneIsLoggedin()) {
             System.out.println("logout from all accounts to login");
@@ -243,17 +363,29 @@ public class Member extends User {
 
         return !endDateFormatted.isBefore(currentDate); // Return true if endDate is not before currentDate
     }
+
     public void updateCSVFile()
     {
+        String[] userData = UserManipulations.lookup(this.getUserType(), this.getUsername());
         String[] newContent = {
+            userData[0],
             this.getUsername(),
             this.getPassword(),
-            this.getEndDate(), 
-            this.getSchedule(), 
-            this.getRenewPrice(),
-            this.getCoach(), 
-            this.getNotifications(),
+            endDate,
+            schedule,
+            renewPrice,
+            coach,
+            notifications,
         };
         UserManipulations.updater(this.getUserType(), newContent, UserManipulations.lineLookup(this.getUserType(), this.getUsername()));
+    }
+    public void updateClass()
+    {
+        String[] userData = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        endDate = userData[3];
+        schedule = userData[4];
+        renewPrice = userData[5];
+        coach = userData[6];
+        notifications = userData[7];
     }
 }

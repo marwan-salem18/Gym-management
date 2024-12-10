@@ -3,40 +3,61 @@ import java.util.ArrayList;
 
 public class Coach extends User{
     private String members;
+    public Coach(String username, String password,String members) 
+    {
+        super(username, password, "coach");
+        this.members = members;
+    }
     public Coach(String username, String password) 
     {
         super(username, password, "coach");
-        this.setMembers(members);
+        this.members = "null";
     }
     public String getMembers() 
     {
         if (members.equals("null")) {
             System.out.println("There is no members assigned to this Coach");
-            return null;
+            return "null";
         }
         return members;
     }
 
     public void setMembers(String members) 
     {
-        // Append ":" after the notification
+        String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        if (userIsRegistered == null) {
+            System.out.println("This Coach is not registered");
+            return;
+        }
         if(this.members == null || members.equals("null"))
         {
-            this.members = "null";
+            updateMembers("null");
         }
-        else if(!members.contains(":")){
-            this.members = members + ":";
+        else if(this.members.contains(":")){
+            String s1 = this.members + members + ":";
+            updateMembers(s1);
         }
         else{
-            this.members += members + ":";
+            updateMembers(members + ":");
         }
     }
 
+    public void updateMembers(String members)
+    {
+        // updates user data in the db
+        String[] userdata = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        int line = UserManipulations.lineLookup(this.getUserType(), this.getUsername());
+        userdata[3] = members;
+        UserManipulations.updater(this.getUserType(), userdata, line);
+        // updates user data in program
+        this.members = members;
+    }
     public String[] getMembersArray() {
         // Split the members string by ":"
         if (members == null || members.equals("null")) {
             return new String[0];  // Return empty array if no members
         }
+        //retrun the String Array of members
         return members.split(":");
     }
 
@@ -56,8 +77,6 @@ public class Coach extends User{
         for (String item : resultList) {
             this.setMembers(item);
         }
-        //update the CSV file
-        this.updateCSVFile();
     }
 
     @Override
@@ -115,7 +134,7 @@ public class Coach extends User{
         }
 
         // Member's schedule is at index 3 
-        String memberSchedule = memberDetails[3];
+        String memberSchedule = memberDetails[4];
 
         // Check if the schedule is already in the member's schedule
         if (memberSchedule != null && Arrays.asList(memberSchedule.split(":")).contains(schedule)) {
@@ -127,9 +146,10 @@ public class Coach extends User{
         memberSchedule = (memberSchedule == null || memberSchedule.equals("null")) ? schedule + ":" : memberSchedule + schedule + ":";
 
         // Update memberDetails and save changes to CSV
-        memberDetails[3] = memberSchedule;
+        memberDetails[4] = memberSchedule;
         UserManipulations.updater("member", memberDetails, UserManipulations.lineLookup("member", member));
 
+        updateCSVFile();
     }
 
     public void deleteScheduleFromMember(String member, String schedule) 
@@ -166,7 +186,7 @@ public class Coach extends User{
         }
 
         // Update memberDetails and save changes to CSV
-        memberDetails[3] = String.join(":", updatedSchedule) + (updatedSchedule.isEmpty() ? "" : ":");
+        memberDetails[4] = String.join(":", updatedSchedule) + (updatedSchedule.isEmpty() ? "" : ":");
         UserManipulations.updater("member", memberDetails, UserManipulations.lineLookup("member", member));
 
         System.out.println("Schedule deleted successfully for member: " + member);
@@ -187,7 +207,7 @@ public class Coach extends User{
         }
 
         // Member's notifications are at index 6 
-        String memberNotifications = memberDetails[6];
+        String memberNotifications = memberDetails[7];
 
         // Check if the notification is already in the member's notifications
         if (memberNotifications != "null" && Arrays.asList(memberNotifications.split(":")).contains(notification)) {
@@ -199,7 +219,7 @@ public class Coach extends User{
         memberNotifications = (memberNotifications == null || memberNotifications.equals("null")) ? notification + ":" : memberNotifications + notification + ":";
 
         // Update memberDetails and save changes to CSV
-        memberDetails[6] = memberNotifications;
+        memberDetails[7] = memberNotifications;
         UserManipulations.updater("member", memberDetails, UserManipulations.lineLookup("member", member));
 
         System.out.println("Notification added successfully for member: " + member);

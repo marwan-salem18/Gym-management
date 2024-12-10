@@ -196,8 +196,13 @@ public class UserManipulations {
             lines.add(""); // Add empty lines if needed
         }
         String content = String.join(",", newContent);
-        // Modify the specific line
-        lines.set(targetLine - 1, content); // targetLine is 1-based
+        // the first line of the csv file is always "1," only with no username so if the array is out of bound then just skip to the next line
+        try{
+            lines.set(targetLine - 1, content); // targetLine is 1-based
+        }
+        catch(Exception ArrayIndexOutOfBoundsException) {
+            return;
+        }
 
         // Write back the modified content
         try {
