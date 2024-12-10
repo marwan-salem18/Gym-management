@@ -67,6 +67,16 @@ public class User {
         return loggedIn;
     }
 
+    public void setUserIsLoggedin(boolean isLogged)
+    {
+        this.loggedIn = isLogged;
+    }
+
+    public void setSomeoneIsLoggedin(boolean isLogged)
+    {
+        someoneIsLogged = isLogged;
+    }
+
     public static boolean getSomeoneIsLoggedin()
     {
         return someoneIsLogged;

@@ -11,7 +11,9 @@ public class UserManipulations {
         switch (usertype) {
             case "member" ->
                     header = new String[]{"ID", "Username", "Password", "endDate", "Schedule", "RenewPrice", "coach","notifications"};
-            case "coach", "admin" -> header = new String[]{"ID", "Username", "Password"};
+            case "coach" ->
+                    header = new String[]{"ID", "Username", "Password", "members"};
+            case "admin" -> header = new String[]{"ID", "Username", "Password"};
             case null, default -> {
                 System.out.println("Not valid");
                 return;
@@ -156,9 +158,16 @@ public class UserManipulations {
             String line;
             //line starts at 0
             int linenumber = 0;
+
             while ((line = br.readLine()) != null) {
                 //increase line number and checks the file for it's username
                 linenumber++;
+
+                // Skip the first two lines
+                if (linenumber <= 2) {
+                    continue;
+                }
+                
                 String[] values = line.split(",");
                 if (Username.equals(values[1])){
                     return linenumber;
