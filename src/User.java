@@ -5,10 +5,10 @@ public class User {
     private String password;
     private String userType;
 
-    // static bool for all users that allows only one user to login at a time (i have absulotly no idea if this will work)
+    // static bool for all users that allows only one user to login at a time (I have absolutely no idea if this will work)
     private static boolean someoneIsLogged = false;
 
-    // local bool for user to check if hes logged in
+    // local bool for user to check if he's logged in
     private boolean loggedIn = false;
 
     User(String username, String password, String userType)
@@ -25,7 +25,7 @@ public class User {
             return;
         }
 
-        // innitializes data in the program
+        // initializes data in the program
         this.userType = userType;
         this.username = username;
         this.password = password;
@@ -124,7 +124,7 @@ public class User {
 
         // adds user to db
         try {
-            // this part will be overritten in children
+            // this part will be overwritten in children
             String[] data = {username, password};
             UserManipulations.AddUser(userType, data);
         } 
@@ -148,7 +148,7 @@ public class User {
             return;
         }
 
-        // logs user in and flags a all users that theres a logged in user
+        // logs user in and flags  all users that there's a logged in user
         someoneIsLogged = true;
         loggedIn = true;
     }

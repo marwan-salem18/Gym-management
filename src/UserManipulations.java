@@ -1,5 +1,6 @@
 import java.io.*;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -10,7 +11,7 @@ public class UserManipulations {
         //check usertype
         switch (usertype) {
             case "member" ->
-                    header = new String[]{"ID", "Username", "Password", "endDate", "Schedule", "RenewPrice", "coach","notifications"};
+                    header = new String[]{"ID", "Username", "Password", "endDate", "Schedule", "RenewPrice", "coach", "notifications", "report"};
             case "coach", "admin" -> header = new String[]{"ID", "Username", "Password"};
             case null, default -> {
                 System.out.println("Not valid");
@@ -35,7 +36,7 @@ public class UserManipulations {
     }
 
     // initializes all our csv files with the headers and the first id 
-    // SHOULD ALWAYS BE IN THE BEGENING OF YOUR MAIN FUNCTION
+    // SHOULD ALWAYS BE IN THE BEGINNING OF YOUR MAIN FUNCTION
     public static void initailizeFiles()
     {
         String[] validTypes = {"admin", "member", "coach"};
@@ -93,11 +94,6 @@ public class UserManipulations {
         return null;
     }
 
-
-    public static void update(String usertype,String[] data){
-    }
-
-
     private static String[] readLastLine(String usertype){
         String lastLine = "";
         //opens a new reader
@@ -151,7 +147,7 @@ public class UserManipulations {
 
 
     public static int lineLookup(String usertype,String Username){
-        //opns a new reader
+        //opens a new reader
         try (BufferedReader br = new BufferedReader(new FileReader(String.format("%s.csv", usertype)))) {
             String line;
             //line starts at 0
@@ -211,5 +207,28 @@ public class UserManipulations {
     
     public static boolean isUnique(String usertype,String username){
         return lookup(usertype, username) == null;
+    }
+    protected static List<String[]> getAllUsers(){
+        String[] usertype = {"admin","coach","member"};
+        List<String[]> Users = new ArrayList<>();
+        String line;
+        for (int i = 0; i < 3; i++) {
+            int j = 0;
+            String currentUser = usertype[i];
+            try (BufferedReader br = new BufferedReader(new FileReader(String.format("%s.csv", currentUser  )))) {
+                while ((line = br.readLine()) != null){
+                    if (j > 1){
+                        String[] values = line.split(",");
+                        Users.add(values);
+                    }
+                    else {
+                        j++;
+                    };
+                }
+            } catch (IOException e) {
+                System.err.println("Error reading CSV file: " + e.getMessage());
+            }
+        }
+        return Users;
     }
 }
