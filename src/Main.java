@@ -91,6 +91,7 @@ public class Main {
         printMemberDetails(member6);
         System.out.println();
         member1.printNotifications();
+
     }
 
     private static void printMemberDetails(Member member) {
@@ -108,4 +109,5 @@ public class Main {
             coach.addNotificationToMember(memberUsername, notification); 
         }
     }
+
 }

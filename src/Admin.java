@@ -40,7 +40,11 @@ public class Admin extends User{
 
     public  void assignCoach(String coach, String username){
         String[] user = UserManipulations.lookup("member",username);
-        if (user != null){
+        if (user != null){;
+            if (UserManipulations.lookup("coach",coach) == null){
+                System.out.println("coach not found");
+                return;
+            }
             user[6] = coach;
             int line = UserManipulations.lineLookup("member",username);
             UserManipulations.updater("member",user,line);
@@ -48,5 +52,12 @@ public class Admin extends User{
         else {
             System.out.println("User doesn't exist");
         }
+    }
+    public void deleteUser(String username,String usertype){
+        String[] user = UserManipulations.lookup(usertype,username);
+        if (user == null){
+            System.out.println("erorr deleting user");
+        }
+
     }
 }

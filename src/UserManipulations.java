@@ -62,7 +62,15 @@ public class UserManipulations {
             }
             else {
                 //checks uniqueness
-                if (!isUnique(usertype, data[0])){
+                if (!isUnique("admin", data[0])){
+                    System.out.println("username already used");
+                    return;
+                }
+                else if (!isUnique("member", data[0])){
+                    System.out.println("username already used");
+                    return;
+                }
+                else if (!isUnique("coach", data[0])){
                     System.out.println("username already used");
                     return;
                 }
@@ -217,6 +225,8 @@ public class UserManipulations {
     public static boolean isUnique(String usertype,String username){
         return lookup(usertype, username) == null;
     }
+
+
     protected static List<String[]> getAllUsers(){
         String[] usertype = {"admin","coach","member"};
         List<String[]> Users = new ArrayList<>();
@@ -239,5 +249,48 @@ public class UserManipulations {
             }
         }
         return Users;
+    }
+
+
+    protected static void DeleteLine(String usertype,int targetLine){
+        String filePath = String.format("%s.csv", usertype); // Path to your CSV file
+        String tempFile = "temp.csv"; // Temporary file to store the updated data
+        int rowToDelete = targetLine; // Row index to delete (starting from 0 for the first row)
+
+        try {
+            // Read the file and store rows in a list
+            List<String> rows = new ArrayList<>();
+            BufferedReader reader = new BufferedReader(new FileReader(filePath));
+            String line;
+            int currentRow = 0;
+            while ((line = reader.readLine()) != null) {
+                // Add to rows if it's not the row to delete
+                if (currentRow != rowToDelete) {
+                    rows.add(line);
+                }
+                currentRow++;
+            }
+            reader.close();
+
+            // Write the updated data to the temporary file
+            BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+            for (String row : rows) {
+                writer.write(row);
+                writer.newLine();
+            }
+            writer.close();
+
+            // Replace the original file with the temporary file
+            File originalFile = new File(filePath);
+            File temp = new File(tempFile);
+
+            if (originalFile.delete() && temp.renameTo(originalFile)) {
+                System.out.println("Row deleted successfully.");
+            } else {
+                System.out.println("Error occurred while deleting the row.");
+            }
+        } catch (IOException e) {
+            System.out.println("erorr deleting line");
+        }
     }
 }
