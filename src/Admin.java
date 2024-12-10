@@ -58,6 +58,7 @@ public class Admin extends User{
         if (user == null){
             System.out.println("erorr deleting user");
         }
-
+        int line = UserManipulations.lineLookup(usertype,username);
+        UserManipulations.DeleteLine(usertype,line);
     }
 }
