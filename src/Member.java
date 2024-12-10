@@ -171,7 +171,7 @@ public class Member extends User {
 
     public String getCoach() 
     {
-        if (coach == null || coach.equals("null")) {
+        if (coach == null || coach == "null") {
             System.out.println("There is no coach for the member.");
             return "null";
         }
@@ -185,7 +185,7 @@ public class Member extends User {
             System.out.println("This Member is not registered");
             return;
         }
-        if(this.coach == null || coach.equals("null"))
+        if(this.coach == null || coach == "null")
         {
             updateCoach("null");
         }

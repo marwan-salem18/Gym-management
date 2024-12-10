@@ -11,7 +11,7 @@ public class Admin extends User{
         return UserManipulations.getAllUsers();
     }
 
-
+    // updates report in csv
     public  void makeReport(String report,String username){
         String[] member = UserManipulations.lookup("member",username);
         if (member != null){
@@ -37,7 +37,7 @@ public class Admin extends User{
         }
     }
 
-
+    // this one looks for both the user and coach before assaging it
     public  void assignCoach(String coach, String username){
         String[] user = UserManipulations.lookup("member",username);
         if (user != null){;

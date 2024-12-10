@@ -229,12 +229,17 @@ public class UserManipulations {
 
     protected static List<String[]> getAllUsers(){
         String[] usertype = {"admin","coach","member"};
+        // stores the users in an linked list of an array
         List<String[]> Users = new ArrayList<>();
         String line;
+        //loops over all types of users
         for (int i = 0; i < 3; i++) {
+            // j to start from line 3 instead of 1
             int j = 0;
             String currentUser = usertype[i];
+            //opens a reader
             try (BufferedReader br = new BufferedReader(new FileReader(String.format("%s.csv", currentUser  )))) {
+                //reads line by line and stores them
                 while ((line = br.readLine()) != null){
                     if (j > 1){
                         String[] values = line.split(",");
@@ -255,17 +260,15 @@ public class UserManipulations {
     protected static void DeleteLine(String usertype,int targetLine){
         String filePath = String.format("%s.csv", usertype); // Path to your CSV file
         String tempFile = "temp.csv"; // Temporary file to store the updated data
-        int rowToDelete = targetLine; // Row index to delete (starting from 0 for the first row)
-
         try {
             // Read the file and store rows in a list
             List<String> rows = new ArrayList<>();
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
             String line;
-            int currentRow = 0;
+            int currentRow = 1;
             while ((line = reader.readLine()) != null) {
                 // Add to rows if it's not the row to delete
-                if (currentRow != rowToDelete) {
+                if (currentRow != targetLine) {
                     rows.add(line);
                 }
                 currentRow++;

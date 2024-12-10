@@ -91,7 +91,8 @@ public class Main {
         printMemberDetails(member6);
         System.out.println();
         member1.printNotifications();
-
+        Admin a = new Admin("f u","idc");
+        a.deleteUser("member2","member");
     }
 
     private static void printMemberDetails(Member member) {
