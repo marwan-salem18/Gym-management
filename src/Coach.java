@@ -3,11 +3,13 @@ import java.util.ArrayList;
 
 public class Coach extends User{
     private String members;
+    //probably won't use this constructor 
     public Coach(String username, String password,String members) 
     {
         super(username, password, "coach");
         this.members = members;
     }
+    // Constructor for Member with username and password only
     public Coach(String username, String password) 
     {
         super(username, password, "coach");
@@ -29,22 +31,28 @@ public class Coach extends User{
             System.out.println("This Coach is not registered");
             return;
         }
+        //entry is null 
         if(this.members == null || members.equals("null"))
         {
+            //update in CSV file
             updateMembers("null");
         }
+        //members has already an entry  
         else if(this.members.contains(":")){
             String s1 = this.members + members + ":";
+            //update in CSV file
             updateMembers(s1);
         }
+        //first entery in the CSV file 
         else{
+            //update in CSV file
             updateMembers(members + ":");
         }
     }
 
     public void updateMembers(String members)
     {
-        // updates user data in the db
+        // updates user data in the CSV file  
         String[] userdata = UserManipulations.lookup(this.getUserType(), this.getUsername());
         int line = UserManipulations.lineLookup(this.getUserType(), this.getUsername());
         userdata[3] = members;
