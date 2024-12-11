@@ -1,8 +1,9 @@
 import java.util.Arrays;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.time.format.DateTimeParseException;
+
 
 public class Member extends User {
     private String endDate = "null";
@@ -10,6 +11,7 @@ public class Member extends User {
     private String renewPrice = "null";
     private String coach = "null";
     private String notifications = "null";
+    private String report = "null";
 
     // Constructor for Member with all valuables (probably will never use it)
     public Member(String username, String password, String endDate, String schedule, String renewPrice, String coach, String notifications) 
@@ -35,10 +37,10 @@ public class Member extends User {
 
     public String getEndDate() 
     {
+        updateClass();
         if (endDate == null || endDate.equals("null")) {
             return "null";
         }
-        updateClass();
         return endDate;
     }
 
@@ -69,6 +71,7 @@ public class Member extends User {
 
     private String getSchedule() 
     {
+        updateClass();
         if (schedule == null || schedule.equals("null")) {
             return "null";
         }
@@ -107,11 +110,11 @@ public class Member extends User {
 
     public String[] getScheduleArray() 
     {
+        updateClass();
         // Split the notifications string by ":"
         if (schedule == null || schedule.equals("null")) {
             return null;  // Return null if no notifications
         }
-        updateClass();
         return schedule.split(":");
     }
 
@@ -137,18 +140,17 @@ public class Member extends User {
 
     public String getRenewPrice() 
     {
+        updateClass();
         if (renewPrice == null || renewPrice.equals("null")) {
             return "null";
         }
-        updateClass();
         return renewPrice;
     }
 
     public void setRenewPrice(String renewPrice) {
         String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
         if (userIsRegistered == null) {
-            System.out.println("This Member is not registered");
-            return;
+            throw new IllegalArgumentException("This Member is not registered");
         }
         if(this.renewPrice == null || renewPrice.equals("null"))
         {
@@ -172,20 +174,18 @@ public class Member extends User {
 
     public String getCoach() 
     {
+        updateClass();
         if (coach == null || coach == "null") {
-            System.out.println("There is no coach for the member.");
             return "null";
         }
         //update the values in the Class
-        updateClass();
         return coach;
     }
 
     public void setCoach(String coach) {
         String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
         if (userIsRegistered == null) {
-            System.out.println("This Member is not registered");
-            return;
+            throw new IllegalArgumentException("This Member is not registered");
         }
         if(this.coach == null || coach == "null")
         {
@@ -210,12 +210,10 @@ public class Member extends User {
 
     private String getNotifications() 
     {
+        updateClass();
         if (notifications == null || notifications.equals("null")) {
-            System.out.println("There are no notifications to display.");
             return "null";
         }
-        //update the values in the Class
-        updateClass();
         return notifications;
     }
 
@@ -223,8 +221,7 @@ public class Member extends User {
     {
         String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
         if (userIsRegistered == null) {
-            System.out.println("This Coach is not registered");
-            return;
+            throw new IllegalArgumentException("This Member is not registered");
         }
         if(this.notifications == null || notifications.equals("null"))
         {
@@ -300,14 +297,12 @@ public class Member extends User {
         // checks if usertype is valid
         String[] validTypes = {"admin", "member", "coach"};
         if (!Arrays.asList(validTypes).contains(this.getUserType())) {
-            System.out.println("invalid user type");
-            return;
+            throw new IllegalArgumentException("invalid user type");
         }
 
         // checks if username is taken
         if (!UserManipulations.isUnique(this.getUserType(), this.getUsername())) {
-            System.out.println("username already taken");
-            return;
+            throw new IllegalArgumentException("username already taken");
         }
 
         // adds user to the CSV file 
@@ -320,10 +315,11 @@ public class Member extends User {
                 this.getRenewPrice(),
                 this.getCoach(), 
                 this.getNotifications(),
+                this.getReport(),
             };
             UserManipulations.AddUser(this.getUserType(), data);
         } catch (Exception e) {
-            System.err.println("something went wrong");
+            throw new IllegalArgumentException("something went wrong");
         }
     }
 
@@ -333,29 +329,21 @@ public class Member extends User {
         // checks if user exists
         String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), username);
         if (userIsRegistered == null) {
-            System.out.println("user is not registered");
-            return;
+            throw new IllegalArgumentException("user is not registered");
         }
 
-        if (!userIsRegistered[2].equals(password))
+        if (!password.equals(userIsRegistered[2]))
         {
-            System.out.println("invalid password");
-            return;
+            throw new IllegalArgumentException("invalid password");
         }
 
         // checks if there's a logged in account in all users
         if (super.getSomeoneIsLoggedin()) {
-            System.out.println("logout from all accounts to login");
-            return;
+            throw new IllegalArgumentException("logout from all accounts to login");
         }
-
         if (!checkEndDate()) {
             this.setNotification("Your subscription has ended");
         }
-        else{
-            deleteNotification("Your subscription has ended:");
-        }
-
         // logs user in and flags all users that there's a logged in user
         super.setSomeoneIsLoggedin(true);
         this.setUserIsLoggedin(true);
@@ -364,22 +352,24 @@ public class Member extends User {
 
     private boolean checkEndDate() 
     {
-        endDate = endDate.replaceAll("\\b(\\d)\\b", "0$1"); // Zero-pad single digits
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); // Corrected pattern
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-M-yyyy");
         String endDate = this.getEndDate(); // Use getter for endDate
         if (endDate == null || endDate.isEmpty()) {
             return false; // If endDate is null (missing), return false
         }
-
-        try {
+        try
+        {
             LocalDate endDateFormatted = LocalDate.parse(endDate, formatter);
             LocalDate currentDate = LocalDate.now();
 
             // Return true if endDate is not before currentDate
             return !endDateFormatted.isBefore(currentDate);
-        } catch (DateTimeParseException e) {
-            return false; // Return false if the date format is invalid
-    }
+        } 
+        catch(DateTimeParseException e)
+        {
+            return false;
+        }
+
     }
 
     private void updateCSVFile()
@@ -394,6 +384,7 @@ public class Member extends User {
             renewPrice,
             coach,
             notifications,
+            report,
         };
         UserManipulations.updater(this.getUserType(), newContent, UserManipulations.lineLookup(this.getUserType(), this.getUsername()));
     }
@@ -401,10 +392,27 @@ public class Member extends User {
     private void updateClass()
     {
         String[] userData = UserManipulations.lookup(this.getUserType(), this.getUsername());
-        endDate = userData[3];
-        schedule = userData[4];
-        renewPrice = userData[5];
-        coach = userData[6];
-        notifications = userData[7];
+        if(userData == null)
+        {
+            return;
+        }
+        else
+        {
+            endDate = userData[3];
+            schedule = userData[4];
+            renewPrice = userData[5];
+            coach = userData[6];
+            notifications = userData[7];
+            report = userData[8];
+        }
+    }
+
+    public String getReport()
+    {
+        updateClass();
+        if (report == null || report.equals("null")) {
+            return "null";
+        }
+        return report;
     }
 }

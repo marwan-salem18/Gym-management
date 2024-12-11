@@ -11,7 +11,7 @@ public class UserManipulations {
         //check usertype
         switch (usertype) {
             case "member" ->
-                    header = new String[]{"ID", "Username", "Password", "endDate", "Schedule", "RenewPrice", "coach","notifications"};
+                    header = new String[]{"ID", "Username", "Password", "endDate", "Schedule", "RenewPrice", "coach","notifications","report"};
             case "coach" ->
                     header = new String[]{"ID", "Username", "Password", "members"};
             case "admin" -> header = new String[]{"ID", "Username", "Password", "Notification"};
@@ -103,10 +103,6 @@ public class UserManipulations {
         }
     }
 
-
-    public static String[] Login(String [] data){
-        return null;
-    }
 
     private static String[] readLastLine(String usertype){
         String lastLine = "";

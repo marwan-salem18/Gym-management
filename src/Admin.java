@@ -39,7 +39,7 @@ public class Admin extends User{
             UserManipulations.updater("member", member,line);
         }
         else {
-            System.out.println("user doesn't exist");
+            throw new IllegalArgumentException("user doesn't exist");
         }
     }
 
@@ -54,7 +54,7 @@ public class Admin extends User{
             UserManipulations.updater("member",user,line);
         }
         else {
-            System.out.println("User doesn't exist");
+            throw new IllegalArgumentException("User doesn't exist");
         }
     }
 
@@ -64,8 +64,7 @@ public class Admin extends User{
 
         if (user != null){;
             if (UserManipulations.lookup("coach",coachUsername) == null){
-                System.out.println("coach not found");
-                return;
+                throw new IllegalArgumentException("coach not found");
             }
 
             user[6] = coachUsername;
@@ -73,7 +72,7 @@ public class Admin extends User{
             UserManipulations.updater("member",user,line);
         }
         else {
-            System.out.println("User doesn't exist");
+            throw new IllegalArgumentException("User doesn't exist");
         }
     }
 
@@ -82,7 +81,7 @@ public class Admin extends User{
         String[] user = UserManipulations.lookup(usertype,username);
 
         if (user == null){
-            System.out.println("erorr deleting user");
+            throw new IllegalArgumentException("No user with that username");
         }
 
         int line = UserManipulations.lineLookup(usertype,username);
@@ -97,8 +96,7 @@ public class Admin extends User{
 
         // checks if username is taken
         if (!UserManipulations.isUnique(userType, NewUsername)) {
-            System.out.println("username already taken");
-            return;
+            throw new IllegalArgumentException("username already taken");
         }
 
         userData[1] = NewUsername;
@@ -125,17 +123,14 @@ public class Admin extends User{
         String[] userData = UserManipulations.lookup("member",username);
         if (userData == null)
         {
-            System.out.println("user does not exist");
-            return;
+            throw new IllegalArgumentException("user does not exist");
         }
         int line = UserManipulations.lineLookup("member",username);
 
 
-       EndDate = EndDate.replaceAll("\\b(\\d)\\b", "0$1"); // Zero-pad single digits
-       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); // Corrected pattern
+       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-M-yyyy"); // Corrected pattern
         // Use getter for endDate
-        if (EndDate == null || EndDate.isEmpty()) {
-            System.out.println("please enter date");
+        if (EndDate == "null" || EndDate.isEmpty()) {
             return; // If endDate is null (missing), return false
         }
 
@@ -143,7 +138,6 @@ public class Admin extends User{
             LocalDate endDateFormatted = LocalDate.parse(EndDate, formatter);
             LocalDate currentDate = LocalDate.now();
             // Return true if endDate is not before currentDate
-            // if the entered date is not valid return it to null and display error
             if (!endDateFormatted.isBefore(currentDate))
             {
                 userData[3] = endDateFormatted.toString();
@@ -151,7 +145,7 @@ public class Admin extends User{
             }
             else
             {
-                System.out.println("enter a proper end date in the future with proper date formatting dd-MM-yyyy");
+                throw new IllegalArgumentException("enter a proper end date in the future with proper date formatting d-M-yyyy");
             }
         }
          catch (DateTimeParseException e) {
@@ -167,8 +161,7 @@ public class Admin extends User{
         // Use the lookup function to get the member's details
         String[] memberDetails = UserManipulations.lookup("member", member);
         if (memberDetails == null) {
-            System.out.println("This member does not exist in the system.");
-            return;
+            throw new IllegalArgumentException("This member does not exist in the system.");
         }
 
         // Member's notifications are at index 7 
@@ -176,12 +169,20 @@ public class Admin extends User{
 
         // Check if the notification is already in the member's notifications
         if (memberNotifications != "null" && Arrays.asList(memberNotifications.split(":")).contains(notification)) {
-            System.out.println("This notification is already there.");
-            return;
+            throw new IllegalArgumentException("This notification is already there.");
         }
-
-        // Add the notification
-        memberNotifications = (memberNotifications == null || memberNotifications.equals("null")) ? notification + ":" : memberNotifications + notification + ":";
+        if(notification.equals("null"))
+        {
+            memberNotifications = "null";
+        }
+        else if(memberNotifications.contains(":")){
+            String s0 = memberNotifications + notification + ":";
+            memberNotifications = s0;
+            throw new IllegalArgumentException(memberNotifications);
+        }
+        else{
+            memberNotifications = notification + ":";
+        }
 
         // Update memberDetails and save changes to CSV
         memberDetails[7] = memberNotifications;
@@ -194,8 +195,7 @@ public class Admin extends User{
         String[] userData = UserManipulations.lookup("member",username);
         if (userData == null)
         {
-            System.out.println("user does not exist");
-            return;
+            throw new IllegalArgumentException("user does not exist");
         }
 
         // Member's schedule is at index 4
@@ -203,16 +203,25 @@ public class Admin extends User{
 
         // Check if the schedule is already in the member's schedule
         if (memberSchedule != null && Arrays.asList(memberSchedule.split(":")).contains(schedule)) {
-            System.out.println("This schedule is already there.");
-            return;
+            throw new IllegalArgumentException("This schedule is already there.");
         }
 
-        // Add the schedule
-        memberSchedule = (memberSchedule == null || memberSchedule.equals("null")) ? schedule + ":" : memberSchedule + schedule + ":";
+        if(schedule.equals("null"))
+        {
+            memberSchedule = "null";
+        }
 
-        // Update memberDetails and save changes to CSV
-        userData[4] = memberSchedule;
-        UserManipulations.updater("member", userData, UserManipulations.lineLookup("member", username));
+        else if(memberSchedule.contains(":")){
+            String s0 = memberSchedule + schedule + ":";
+            memberSchedule = s0;
+        }
+
+        else{
+            memberSchedule = schedule + ":";
+        }
+            // Update memberDetails and save changes to CSV
+            userData[4] = memberSchedule;
+            UserManipulations.updater("member", userData, UserManipulations.lineLookup("member", username));
 
     }
 
@@ -221,8 +230,7 @@ public class Admin extends User{
         String[] userData = UserManipulations.lookup("member",username);
         if (userData == null)
         {
-            System.out.println("user does not exist");
-            return;
+            throw new IllegalArgumentException("user does not exist");
         }
 
         changeBill(bill, username);
@@ -236,13 +244,11 @@ public class Admin extends User{
         String[] coachData = UserManipulations.lookup("coach",coachUsername);
         if (memberData == null)
         {
-            System.out.println("member does not exist");
-            return;
+            throw new IllegalArgumentException("member does not exist");
         }
         if (coachData == null)
         {
-            System.out.println("coach does not exist");
-            return;
+            throw new IllegalArgumentException("coach does not exist");
         }
         assignCoach(coachUsername, memberUsername);
     }
@@ -252,8 +258,7 @@ public class Admin extends User{
         // checks if usertype is valid
         String[] validTypes = {"admin", "member", "coach"};
         if (!Arrays.asList(validTypes).contains(userType)){
-            System.out.println("invalid user type");
-            return null;
+            throw new IllegalArgumentException("invalid user type");
         }
 
         // return an array of user data
@@ -265,7 +270,6 @@ public class Admin extends User{
     private String getNotifications() 
     {
         if (notifications == null || notifications.equals("null")) {
-            System.out.println("There are no notifications to display.");
             return "null";
         }
         //update the values in the Class
@@ -277,8 +281,7 @@ public class Admin extends User{
     {
         String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
         if (userIsRegistered == null) {
-            System.out.println("This admin is not registered");
-            return;
+            throw new IllegalArgumentException("This admin is not registered");
         }
         if(this.notifications == null || notifications.equals("null"))
         {
@@ -371,13 +374,19 @@ public class Admin extends User{
 
         for (int i = 0; i < membersUsername.size(); i++)
         {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate endDateFormatted = LocalDate.parse(membersDates.get(i), formatter);
-            LocalDate currentDate = LocalDate.now();
-
-            if (endDateFormatted.isBefore(currentDate))
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d");
+            try
             {
-                setNotification(membersUsername.get(i) + "'s subscription ended on " + membersDates.get(i));
+                LocalDate endDateFormatted = LocalDate.parse(membersDates.get(i), formatter);
+                LocalDate currentDate = LocalDate.now();
+                if (endDateFormatted.isBefore(currentDate))
+                {
+                    setNotification(membersUsername.get(i) + "'s subscription ended on " + membersDates.get(i));
+                }
+            }
+            catch(DateTimeParseException e)
+            {
+                throw new IllegalArgumentException("there is no End date for this user");
             }
         }
     }
@@ -395,14 +404,12 @@ public class Admin extends User{
         // checks if usertype is valid
         String[] validTypes = {"admin", "member", "coach"};
         if (!Arrays.asList(validTypes).contains(this.getUserType())) {
-            System.out.println("invalid user type");
-            return;
+            throw new IllegalArgumentException("invalid user type");
         }
 
         // checks if username is taken
         if (!UserManipulations.isUnique(this.getUserType(), this.getUsername())) {
-            System.out.println("username already taken");
-            return;
+            throw new IllegalArgumentException("username already taken");
         }
 
         // adds user to the CSV file 
@@ -414,7 +421,7 @@ public class Admin extends User{
             };
             UserManipulations.AddUser(this.getUserType(), data);
         } catch (Exception e) {
-            System.err.println("something went wrong");
+            throw new IllegalArgumentException("something went wrong");
         }
     }
 

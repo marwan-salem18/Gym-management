@@ -16,8 +16,7 @@ public class User {
         // checks if usertype is valid
         String[] validTypes = {"admin", "member", "coach"};
         if (!Arrays.asList(validTypes).contains(userType)){
-            System.out.println("invalid user type");
-            return;
+            throw new IllegalArgumentException("invalid user type");
         }
         
 
@@ -88,8 +87,7 @@ public class User {
     {
         // checks if username is taken
         if (!UserManipulations.isUnique(this.userType, username)){
-            System.out.println("username already taken");
-            return;
+            throw new IllegalArgumentException("username already taken");
         }
 
         // updates user data in the db
@@ -118,14 +116,12 @@ public class User {
         // checks if usertype is valid
         String[] validTypes = {"admin", "member", "coach"};
         if (!Arrays.asList(validTypes).contains(this.userType)){
-            System.out.println("invalid user type");
-            return;
+            throw new IllegalArgumentException("invalid user type");
         }
 
         // checks if username is taken
         if (!UserManipulations.isUnique(userType, username)){
-            System.out.println("username already taken");
-            return;
+            throw new IllegalArgumentException("username already taken");
         }
 
         // adds user to db
@@ -135,7 +131,7 @@ public class User {
             UserManipulations.AddUser(userType, data);
         } 
         catch (Exception e) {
-            System.err.println("something went wrong");
+            throw new IllegalArgumentException("something went wrong");
         }
     }
 
@@ -144,22 +140,17 @@ public class User {
         // checks if user exists
         String[] userIsRegistered = UserManipulations.lookup(userType, username);
         if (userIsRegistered == null) {
-            System.out.println("user is not registered");
-            return;
+            throw new IllegalArgumentException("user is not registered");
         }
 
-        if (userIsRegistered[2] != password)
+        if (!password.equals(userIsRegistered[2]))
         {
-            System.out.println("invalid password");
-            return;
+            throw new IllegalArgumentException("invalid password");
         }
-
-
-
+        
         // checks if theres a logged in account in all users
         if (someoneIsLogged) {
-            System.out.println("logout from all accounts to login");
-            return;
+            throw new IllegalArgumentException("logout from all accounts to login");
         }
 
         // logs user in and flags  all users that there's a logged in user
@@ -171,7 +162,7 @@ public class User {
     {
         // cant log out without logging in
         if (!loggedIn) {
-            System.out.println("you cant logout without logging in");
+            throw new IllegalArgumentException("you cant logout without logging in");
         }
 
         // logs out and flags all users that they can log in

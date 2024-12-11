@@ -18,7 +18,6 @@ public class Coach extends User{
     private String getMembers() 
     {
         if (members.equals("null")) {
-            System.out.println("There is no members assigned to this Coach");
             return "null";
         }
         return members;
@@ -28,8 +27,7 @@ public class Coach extends User{
     {
         String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
         if (userIsRegistered == null) {
-            System.out.println("This Coach is not registered");
-            return;
+            throw new IllegalArgumentException("This Coach is not registered");
         }
         //entry is null 
         if(this.members == null || members.equals("null"))
@@ -94,14 +92,12 @@ public class Coach extends User{
         // checks if usertype is valid
         String[] validTypes = {"admin", "member", "coach"};
         if (!Arrays.asList(validTypes).contains(this.getUserType())) {
-            System.out.println("invalid user type");
-            return;
+            throw new IllegalArgumentException("invalid user type");
         }
 
         // checks if username is taken
         if (!UserManipulations.isUnique(this.getUserType(), this.getUsername())) {
-            System.out.println("username already taken");
-            return;
+            throw new IllegalArgumentException("username already taken");
         }
 
         // adds user to the CSV file 
@@ -113,7 +109,7 @@ public class Coach extends User{
             };
             UserManipulations.AddUser(this.getUserType(), data);
         } catch (Exception e) {
-            System.err.println("something went wrong");
+            throw new IllegalArgumentException("something went wrong");
         }
     }
     
@@ -131,49 +127,45 @@ public class Coach extends User{
     {
         // Check if the member is in the Coach's members array
         if (!Arrays.asList(this.getMembersArray()).contains(member)) {
-            System.out.println("This member is not assigned to this coach.");
-            return;
+            throw new IllegalArgumentException("This member is not assigned to this coach.");
         }
 
         // Use the lookup function to get the member's details
         String[] memberDetails = UserManipulations.lookup("member", member);
         if (memberDetails == null) {
-            System.out.println("This member does not exist in the system.");
-            return;
+            throw new IllegalArgumentException("This member does not exist in the system.");
         }
 
         // Member's schedule is at index 3 
         String memberSchedule = memberDetails[4];
-
-        // Check if the schedule is already in the member's schedule
-        if (memberSchedule != null && Arrays.asList(memberSchedule.split(":")).contains(schedule)) {
-            System.out.println("This schedule is already there.");
-            return;
+        
+        if(schedule.equals("null"))
+        {
+            memberSchedule = "null";
         }
-
-        // Add the schedule
-        memberSchedule = (memberSchedule == null || memberSchedule.equals("null")) ? schedule + ":" : memberSchedule + schedule + ":";
-
+        else if(memberSchedule.contains(":")){
+            String s0 = memberSchedule + schedule + ":";
+            memberSchedule = s0;
+        }
+        else{
+            memberSchedule = schedule + ":";
+        }
         // Update memberDetails and save changes to CSV
         memberDetails[4] = memberSchedule;
         UserManipulations.updater("member", memberDetails, UserManipulations.lineLookup("member", member));
-
-        updateCSVFile();
     }
 
     public void deleteScheduleFromMember(String member, String schedule) 
     {
         // Check if the member is in the Coach's members array
         if (!Arrays.asList(this.getMembersArray()).contains(member)) {
-            System.out.println("This member is not assigned to this coach.");
-            return;
+            throw new IllegalArgumentException("This member is not assigned to this coach.");
         }
 
         // Use the lookup function to get the member's details
         String[] memberDetails = UserManipulations.lookup("member", member);
         if (memberDetails == null) {
-            System.out.println("This member does not exist in the system.");
-            return;
+            throw new IllegalArgumentException("This member does not exist in the system.");
         }
 
         // Member's schedule is at index 3 
@@ -181,8 +173,7 @@ public class Coach extends User{
 
         // Check if the schedule exists in the member's schedule
         if (memberSchedule.equals("null") || !Arrays.asList(memberSchedule.split(":")).contains(schedule)) {
-            System.out.println("This schedule does not exist for the member.");
-            return;
+            throw new IllegalArgumentException("This schedule does not exist for the member.");
         }
 
         // Remove the schedule
@@ -197,36 +188,31 @@ public class Coach extends User{
         // Update memberDetails and save changes to CSV
         memberDetails[4] = String.join(":", updatedSchedule) + (updatedSchedule.isEmpty() ? "" : ":");
         UserManipulations.updater("member", memberDetails, UserManipulations.lineLookup("member", member));
-
-        System.out.println("Schedule deleted successfully for member: " + member);
     }
 
     public void addNotificationToMember(String member, String notification) {
         // Check if the member is in the Coach's members array
         if (!Arrays.asList(this.getMembersArray()).contains(member)) {
-            System.out.println("This member is not assigned to this coach.");
-            return;
+            throw new IllegalArgumentException("This member is not assigned to this coach.");
         }
 
         // Use the lookup function to get the member's details
         String[] memberDetails = UserManipulations.lookup("member", member);
         if (memberDetails == null) {
-            System.out.println("This member does not exist in the system.");
-            return;
+            throw new IllegalArgumentException("This member does not exist in the system.");
         }
-
-        // Member's notifications are at index 6 
         String memberNotifications = memberDetails[7];
-
-        // Check if the notification is already in the member's notifications
-        if (memberNotifications != "null" && Arrays.asList(memberNotifications.split(":")).contains(notification)) {
-            System.out.println("This notification is already there.");
-            return;
+        if(notification.equals("null"))
+        {
+            memberNotifications = "null";
         }
-
-        // Add the notification
-        memberNotifications = (memberNotifications == null || memberNotifications.equals("null")) ? notification + ":" : memberNotifications + notification + ":";
-
+        else if(memberNotifications.contains(":")){
+            String s0 = memberNotifications + notification + ":";
+            memberNotifications = s0;
+        }
+        else{
+            memberNotifications = notification + ":";
+        }
         // Update memberDetails and save changes to CSV
         memberDetails[7] = memberNotifications;
         UserManipulations.updater("member", memberDetails, UserManipulations.lineLookup("member", member));
