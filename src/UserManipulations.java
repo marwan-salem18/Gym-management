@@ -28,7 +28,11 @@ public class UserManipulations {
                 bw.write(",");
             }
             bw.newLine();
-            bw.write("1");
+            switch (usertype) {
+                case "member" -> bw.write("3000");
+                case "admin" -> bw.write("1000");
+                case "coach" -> bw.write("2000");
+            }
             bw.write(",");
             bw.newLine();
         
