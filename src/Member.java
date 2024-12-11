@@ -55,7 +55,7 @@ public class Member extends User {
         }
     }
 
-    public void updateEndDate(String endDate)
+    private void updateEndDate(String endDate)
     {
         // updates user data in the db
         String[] userdata = UserManipulations.lookup(this.getUserType(), this.getUsername());
@@ -66,7 +66,7 @@ public class Member extends User {
         this.endDate = endDate;
     }
 
-    public String getSchedule() 
+    private String getSchedule() 
     {
         if (schedule == null || schedule.equals("null")) {
             return "null";
@@ -93,7 +93,7 @@ public class Member extends User {
         }
     }
 
-    public void updateSchedule(String schedule)
+    private void updateSchedule(String schedule)
     {
         // updates user data in the db
         String[] userdata = UserManipulations.lookup(this.getUserType(), this.getUsername());
@@ -158,7 +158,7 @@ public class Member extends User {
         }
     }
 
-    public void updateRenewPrice(String renewPrice)
+    private void updateRenewPrice(String renewPrice)
     {
         // updates user data in the db
         String[] userdata = UserManipulations.lookup(this.getUserType(), this.getUsername());
@@ -179,6 +179,7 @@ public class Member extends User {
         updateClass();
         return coach;
     }
+
     public void setCoach(String coach) {
         String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
         if (userIsRegistered == null) {
@@ -194,7 +195,7 @@ public class Member extends User {
         }
     }
 
-    public void updateCoach(String coach)
+    private void updateCoach(String coach)
     {
         // updates user data in the db
         String[] userdata = UserManipulations.lookup(this.getUserType(), this.getUsername());
@@ -206,7 +207,7 @@ public class Member extends User {
     }
 
 
-    public String getNotifications() 
+    private String getNotifications() 
     {
         if (notifications == null || notifications.equals("null")) {
             System.out.println("There are no notifications to display.");
@@ -217,7 +218,7 @@ public class Member extends User {
         return notifications;
     }
 
-    public void setNotifications(String notifications) 
+    public void setNotification(String notifications) 
     {
         String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
         if (userIsRegistered == null) {
@@ -237,7 +238,7 @@ public class Member extends User {
         }
     }
 
-    public void updateNotifications(String notifications)
+    private void updateNotifications(String notifications)
     {
         // updates user data in the db
         String[] userdata = UserManipulations.lookup(this.getUserType(), this.getUsername());
@@ -283,10 +284,10 @@ public class Member extends User {
                 resultList.add(str);
             }
         }
-        this.setNotifications("null"); // Clear notifications
+        this.setNotification("null"); // Clear notifications
         // Loop through each element in the updated list and apply the setNotifications function
         for (String item : resultList) {
-            this.setNotifications(item);
+            this.setNotification(item);
         }
         //update the values in Class 
         this.updateClass();
@@ -342,7 +343,7 @@ public class Member extends User {
         }
 
         if (!checkEndDate()) {
-            this.setNotifications("Your subscription has ended");
+            this.setNotification("Your subscription has ended");
         }
 
         // logs user in and flags all users that there's a logged in user
@@ -350,8 +351,9 @@ public class Member extends User {
         this.setUserIsLoggedin(true);
     }
 
-    public boolean checkEndDate() 
+    private boolean checkEndDate() 
     {
+        endDate = endDate.replaceAll("\\b(\\d)\\b", "0$1"); // Zero-pad single digits
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); // Corrected pattern
         String endDate = this.getEndDate(); // Use getter for endDate
         if (endDate == null) {
@@ -364,7 +366,7 @@ public class Member extends User {
         return !endDateFormatted.isBefore(currentDate); // Return true if endDate is not before currentDate
     }
 
-    public void updateCSVFile()
+    private void updateCSVFile()
     {
         String[] userData = UserManipulations.lookup(this.getUserType(), this.getUsername());
         String[] newContent = {
@@ -379,7 +381,8 @@ public class Member extends User {
         };
         UserManipulations.updater(this.getUserType(), newContent, UserManipulations.lineLookup(this.getUserType(), this.getUsername()));
     }
-    public void updateClass()
+
+    private void updateClass()
     {
         String[] userData = UserManipulations.lookup(this.getUserType(), this.getUsername());
         endDate = userData[3];

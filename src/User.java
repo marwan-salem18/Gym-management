@@ -19,11 +19,7 @@ public class User {
             System.out.println("invalid user type");
             return;
         }
-        // checks if username is taken
-        if (!UserManipulations.isUnique(userType, username)){
-            System.out.println("username already taken");
-            return;
-        }
+        
 
         // initializes data in the program
         this.userType = userType;

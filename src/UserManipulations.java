@@ -14,7 +14,7 @@ public class UserManipulations {
                     header = new String[]{"ID", "Username", "Password", "endDate", "Schedule", "RenewPrice", "coach","notifications"};
             case "coach" ->
                     header = new String[]{"ID", "Username", "Password", "members"};
-            case "admin" -> header = new String[]{"ID", "Username", "Password"};
+            case "admin" -> header = new String[]{"ID", "Username", "Password", "Notification"};
             case null, default -> {
                 System.out.println("Not valid");
                 return;

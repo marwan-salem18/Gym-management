@@ -15,7 +15,7 @@ public class Coach extends User{
         super(username, password, "coach");
         this.members = "null";
     }
-    public String getMembers() 
+    private String getMembers() 
     {
         if (members.equals("null")) {
             System.out.println("There is no members assigned to this Coach");
@@ -24,7 +24,7 @@ public class Coach extends User{
         return members;
     }
 
-    public void setMembers(String members) 
+    public void setMember(String members) 
     {
         String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
         if (userIsRegistered == null) {
@@ -50,7 +50,7 @@ public class Coach extends User{
         }
     }
 
-    public void updateMembers(String members)
+    private void updateMembers(String members)
     {
         // updates user data in the CSV file  
         String[] userdata = UserManipulations.lookup(this.getUserType(), this.getUsername());
@@ -60,6 +60,7 @@ public class Coach extends User{
         // updates user data in program
         this.members = members;
     }
+
     public String[] getMembersArray() {
         // Split the members string by ":"
         if (members == null || members.equals("null")) {
@@ -70,7 +71,7 @@ public class Coach extends User{
     }
 
     // Delete a notification from the members List
-    public void deleteMembers(String memberToRemove) {
+    public void deleteMember(String memberToRemove) {
         String[] membersArray = this.getMembersArray();
         ArrayList<String> resultList = new ArrayList<>();
 
@@ -80,10 +81,10 @@ public class Coach extends User{
                 resultList.add(str);
             }
         }
-        this.setMembers("null"); // Clear notifications
+        this.setMember("null"); // Clear notifications
         // Loop through each element in the updated list and apply the setmembers function
         for (String item : resultList) {
-            this.setMembers(item);
+            this.setMember(item);
         }
     }
 
@@ -116,7 +117,7 @@ public class Coach extends User{
         }
     }
     
-    public void updateCSVFile()
+    private void updateCSVFile()
     {
         String[] newContent = {
             this.getUsername(),
@@ -230,6 +231,5 @@ public class Coach extends User{
         memberDetails[7] = memberNotifications;
         UserManipulations.updater("member", memberDetails, UserManipulations.lineLookup("member", member));
 
-        System.out.println("Notification added successfully for member: " + member);
     }
 }
