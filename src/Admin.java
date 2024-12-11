@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -131,24 +132,31 @@ public class Admin extends User{
        EndDate = EndDate.replaceAll("\\b(\\d)\\b", "0$1"); // Zero-pad single digits
        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); // Corrected pattern
         // Use getter for endDate
-        if (EndDate == null) {
+        if (EndDate == null || EndDate.isEmpty()) {
             System.out.println("please enter date");
             return; // If endDate is null (missing), return false
         }
 
-        LocalDate endDateFormatted = LocalDate.parse(EndDate, formatter);
-        LocalDate currentDate = LocalDate.now();
+        try {
+            LocalDate endDateFormatted = LocalDate.parse(EndDate, formatter);
+            LocalDate currentDate = LocalDate.now();
+            // Return true if endDate is not before currentDate
+            // if the entered date is not valid return it to null and display error
+            if (!endDateFormatted.isBefore(currentDate))
+            {
+                userData[3] = endDateFormatted.toString();
+                UserManipulations.updater("member",userData,line);
+            }
+            else
+            {
+                System.out.println("enter a proper end date in the future with proper date formatting dd-MM-yyyy");
+            }
+        }
+         catch (DateTimeParseException e) {
+           return; // Return false if the date format is invalid
+        }
         
-        // if the entered date is not valid return it to null and display error
-        if (!endDateFormatted.isBefore(currentDate))
-        {
-            userData[3] = endDateFormatted.toString();
-            UserManipulations.updater("member",userData,line);
-        }
-        else
-        {
-            System.out.println("enter a proper end date in the future with proper date formatting dd-MM-yyyy");
-        }
+        
     }
 
     // cry to ali

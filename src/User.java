@@ -139,14 +139,22 @@ public class User {
         }
     }
 
-    public void login()
+    public void login(String username, String password)
     {
         // checks if user exists
-        String[] userIsRegistered = UserManipulations.lookup(userType, this.username);
+        String[] userIsRegistered = UserManipulations.lookup(userType, username);
         if (userIsRegistered == null) {
             System.out.println("user is not registered");
             return;
         }
+
+        if (userIsRegistered[2] != password)
+        {
+            System.out.println("invalid password");
+            return;
+        }
+
+
 
         // checks if theres a logged in account in all users
         if (someoneIsLogged) {

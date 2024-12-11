@@ -1,6 +1,7 @@
 import java.util.Arrays;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 public class Member extends User {
@@ -327,12 +328,18 @@ public class Member extends User {
     }
 
     @Override
-    public void login() 
+    public void login(String username, String password)
     {
         // checks if user exists
-        String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), this.getUsername());
+        String[] userIsRegistered = UserManipulations.lookup(this.getUserType(), username);
         if (userIsRegistered == null) {
             System.out.println("user is not registered");
+            return;
+        }
+
+        if (!userIsRegistered[2].equals(password))
+        {
+            System.out.println("invalid password");
             return;
         }
 
@@ -345,10 +352,14 @@ public class Member extends User {
         if (!checkEndDate()) {
             this.setNotification("Your subscription has ended");
         }
+        else{
+            deleteNotification("Your subscription has ended:");
+        }
 
         // logs user in and flags all users that there's a logged in user
         super.setSomeoneIsLoggedin(true);
         this.setUserIsLoggedin(true);
+
     }
 
     private boolean checkEndDate() 
@@ -356,14 +367,19 @@ public class Member extends User {
         endDate = endDate.replaceAll("\\b(\\d)\\b", "0$1"); // Zero-pad single digits
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); // Corrected pattern
         String endDate = this.getEndDate(); // Use getter for endDate
-        if (endDate == null) {
+        if (endDate == null || endDate.isEmpty()) {
             return false; // If endDate is null (missing), return false
         }
 
-        LocalDate endDateFormatted = LocalDate.parse(endDate, formatter);
-        LocalDate currentDate = LocalDate.now();
+        try {
+            LocalDate endDateFormatted = LocalDate.parse(endDate, formatter);
+            LocalDate currentDate = LocalDate.now();
 
-        return !endDateFormatted.isBefore(currentDate); // Return true if endDate is not before currentDate
+            // Return true if endDate is not before currentDate
+            return !endDateFormatted.isBefore(currentDate);
+        } catch (DateTimeParseException e) {
+            return false; // Return false if the date format is invalid
+    }
     }
 
     private void updateCSVFile()
