@@ -261,6 +261,26 @@ public class UserManipulations {
     }
 
 
+    protected static List<String[]> getSomeUsers(String usertype){
+        List<String[]> allUsers = getAllUsers();
+        List<String[]> users = getAllUsers();
+        for (int i = 0; i < allUsers.size(); i++) {
+            String idAsStrind = allUsers.get(i)[0];
+            int id = Integer.parseInt(idAsStrind);
+            if (id > 1000 && id < 2000 && usertype == "admin"){
+                users.add(allUsers.get(i));
+            }
+            if (id > 2000 && id < 3000 && usertype == "coach"){
+                users.add(allUsers.get(i));
+            }
+            if (id > 3000 && usertype == "member"){
+                users.add(allUsers.get(i));
+            }
+        }
+        return users;
+    }
+
+
     protected static void DeleteLine(String usertype,int targetLine){
         String filePath = String.format("%s.csv", usertype); // Path to your CSV file
         String tempFile = "temp.csv"; // Temporary file to store the updated data

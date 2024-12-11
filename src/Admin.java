@@ -24,7 +24,9 @@ public class Admin extends User{
     public List<String[]> checkAllUsers(){
         return UserManipulations.getAllUsers();
     }
-
+    public List<String[]> getTypeUser(String usertype){
+        return UserManipulations.getSomeUsers(usertype);
+    }
     
     public void makeReport(String report,String username){
         String[] member = UserManipulations.lookup("member",username);
