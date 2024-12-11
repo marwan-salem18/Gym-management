@@ -21,10 +21,12 @@ public class Admin extends User{
     }
 
 
-    public List<String[]> checkAllUsers(){
+    private List<String[]> checkAllUsers(){
         return UserManipulations.getAllUsers();
     }
-    public List<String[]> getTypeUser(String usertype){
+
+
+    private List<String[]> getAllUserOfType(String usertype){
         return UserManipulations.getSomeUsers(usertype);
     }
     
@@ -422,6 +424,41 @@ public class Admin extends User{
             UserManipulations.AddUser(this.getUserType(), data);
         } catch (Exception e) {
             throw new IllegalArgumentException("something went wrong");
+        }
+    }
+
+    public void addUser(String username, String password,String Usertype){
+        if (Usertype == "admin"){
+            String[] data = {
+                    username,
+                    password,
+                    "null",
+            };
+            UserManipulations.AddUser(Usertype,data);
+            return;
+        }
+        else if (Usertype == "coach"){
+            String[] data = {
+                    username,
+                    password,
+                    "null",
+            };
+            UserManipulations.AddUser(Usertype,data);
+            return;
+        }
+        else if (Usertype == "member"){
+            String[] data = {
+                    username,
+                    password,
+                    "null",
+                    "null",
+                    "null",
+                    "null",
+                    "null",
+                    "null",
+            };
+            UserManipulations.AddUser(Usertype,data);
+            return;
         }
     }
 

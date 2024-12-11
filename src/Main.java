@@ -16,6 +16,8 @@ public class Main {
         catch(Exception e){
             System.out.println(e.getMessage());
         }
+        Admin a = new Admin("dezz","nuts");
+        a.addUser("hi","it's me","admin");
     }
 
 }
