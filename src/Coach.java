@@ -3,7 +3,8 @@ import java.util.ArrayList;
 
 public class Coach extends User{
     private String members;
-    //probably won't use this constructor 
+    //probably won't use this constructor
+    public Coach() {}
     public Coach(String username, String password,String members) 
     {
         super(username, password, "coach");
@@ -33,17 +34,22 @@ public class Coach extends User{
         if(this.members == null || members.equals("null"))
         {
             //update in CSV file
+            updateCoachInMembers("null");
             updateMembers("null");
         }
         //members has already an entry  
         else if(this.members.contains(":")){
             String s1 = this.members + members + ":";
-            //update in CSV file
+            //update in CSV
+            updateCoachInMembers(members);
+
             updateMembers(s1);
         }
         //first entery in the CSV file 
         else{
             //update in CSV file
+            updateCoachInMembers(members);
+
             updateMembers(members + ":");
         }
     }
@@ -55,17 +61,30 @@ public class Coach extends User{
         int line = UserManipulations.lineLookup(this.getUserType(), this.getUsername());
         userdata[3] = members;
         UserManipulations.updater(this.getUserType(), userdata, line);
+
+
         // updates user data in program
         this.members = members;
     }
 
+
+    private void updateCoachInMembers(String members) {
+        String[] memberdata = UserManipulations.lookup("member", members);
+        int line2 = UserManipulations.lineLookup("member", members);
+        memberdata[6] = members;
+        UserManipulations.updater("member", memberdata, line2);
+    }
+
     public String[] getMembersArray() {
         // Split the members string by ":"
-        if (members == null || members.equals("null")) {
+        String[] coach = UserManipulations.lookup("coach", this.getUsername());
+        String membersOfCoach = coach[3];
+
+        if (membersOfCoach == null || membersOfCoach.isBlank() || membersOfCoach.equals("null")) {
             return new String[0];  // Return empty array if no members
         }
         //retrun the String Array of members
-        return members.split(":");
+        return membersOfCoach.split(":");
     }
 
     // Delete a notification from the members List
@@ -109,7 +128,7 @@ public class Coach extends User{
             };
             UserManipulations.AddUser(this.getUserType(), data);
         } catch (Exception e) {
-            throw new IllegalArgumentException("something went wrong");
+            throw new IllegalArgumentException(e.getMessage());
         }
     }
     

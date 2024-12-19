@@ -13,6 +13,7 @@ public class Member extends User {
     private String notifications = "null";
     private String report = "null";
 
+    public Member() {}
     // Constructor for Member with all valuables (probably will never use it)
     public Member(String username, String password, String endDate, String schedule, String renewPrice, String coach, String notifications) 
     {
@@ -23,6 +24,17 @@ public class Member extends User {
         this.coach = coach;
         this.notifications = notifications;
     }
+
+    public Member(String username, String password, String endDate) 
+    {
+        super(username, password, "member");
+        this.endDate = endDate;
+        this.schedule = "null";
+        this.renewPrice = "null";
+        this.coach = "null";
+        this.notifications = "null";
+    }
+
 
     // Constructor for Member with username and password only
     public Member(String username, String password) 
@@ -228,6 +240,14 @@ public class Member extends User {
             updateNotifications("null");
         }
         else if(this.notifications.contains(":")){
+
+            String[] notiArray = getNotificationsArray();
+            for (String noti : notiArray)
+            {
+                if (noti.equals(notifications))
+                    return;
+            }
+
             String s0 = this.notifications + notifications + ":";
             updateNotifications(s0);
         }
@@ -249,11 +269,13 @@ public class Member extends User {
 
     public String[] getNotificationsArray() 
     {
+        String[] memberData = UserManipulations.lookup("member", this.getUsername());
+        String memberNotifications = memberData[7];
         // Split the notifications string by ":"
-        if (notifications == null || notifications.equals("null")) {
-            return null;  // Return empty array if no notifications
+        if (memberNotifications == null || memberNotifications.equals("null") || memberNotifications.isBlank() ) {
+            return new String[0];  // Return empty array if no notifications
         }
-        return notifications.split(":");
+        return memberNotifications.split(":");
     }
 
     public void printNotifications()
@@ -305,8 +327,7 @@ public class Member extends User {
             throw new IllegalArgumentException("username already taken");
         }
 
-        // adds user to the CSV file 
-        try {
+        // adds user to the CSV file
             String[] data = {
                 this.getUsername(),
                 this.getPassword(),
@@ -317,10 +338,9 @@ public class Member extends User {
                 this.getNotifications(),
                 this.getReport(),
             };
+
             UserManipulations.AddUser(this.getUserType(), data);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("something went wrong");
-        }
+
     }
 
     @Override
@@ -341,7 +361,7 @@ public class Member extends User {
         if (super.getSomeoneIsLoggedin()) {
             throw new IllegalArgumentException("logout from all accounts to login");
         }
-        if (!checkEndDate()) {
+        if (!checkEndDate() && !this.getEndDate().equals("null")) {
             this.setNotification("Your subscription has ended");
         }
         // logs user in and flags all users that there's a logged in user
@@ -352,7 +372,7 @@ public class Member extends User {
 
     private boolean checkEndDate() 
     {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-M-yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         String endDate = this.getEndDate(); // Use getter for endDate
         if (endDate == null || endDate.isEmpty()) {
             return false; // If endDate is null (missing), return false
@@ -411,7 +431,7 @@ public class Member extends User {
     {
         updateClass();
         if (report == null || report.equals("null")) {
-            return "null";
+            return "There is no report assigned to you";
         }
         return report;
     }
