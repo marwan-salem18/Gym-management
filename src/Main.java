@@ -354,11 +354,15 @@ public class Main extends JFrame {
             updateInfoButton.addActionListener(e -> updateMyInfo(loggedInAdmin));
 
             JButton myInfoButton = createStyledButton("My Info");
-            updateInfoButton.addActionListener(e -> getMYInfo(loggedInAdmin));
+            myInfoButton.addActionListener(e -> getMYInfo(loggedInAdmin));
+
+            JButton setEndDate = createStyledButton("Set end date for member");
+            setEndDate.addActionListener(e -> handleSetDate());
 
             buttonPanel.add(manageCoachesButton);
             buttonPanel.add(manageMembersButton);
             buttonPanel.add(manageBillingButton);
+            buttonPanel.add(setEndDate);
             buttonPanel.add(sendNotificationsButton);
             buttonPanel.add(assignMembersButton);
             buttonPanel.add(makeReportButton);
@@ -819,13 +823,54 @@ public class Main extends JFrame {
         JOptionPane.showMessageDialog(this, e.getMessage(), "Assignment Failed ", JOptionPane.ERROR_MESSAGE);
     }
 }
+
+
+    private void handleSetDate()
+    {
+        String username = JOptionPane.showInputDialog(this, "Enter Member Username:");
+        if(username == null){
+            return;
+        }
+        if (username.isBlank() || username.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Username cannot be empty.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String endDate = JOptionPane.showInputDialog(this, "Enter Member EndDate(after today and in format DD-MM-YYYY):");
+
+        try {
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            LocalDate endDateFormatted = LocalDate.parse(endDate, formatter);
+            LocalDate currentDate = LocalDate.now();
+
+
+
+            if (endDate == null || endDate.trim().isEmpty() || endDateFormatted.isBefore(currentDate) || endDateFormatted.isEqual(currentDate)) {
+                JOptionPane.showMessageDialog(this, "EndDate should be in format DD-MM-YYYY and after TODAY", "Input Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            loggedInAdmin.updateMemberEndDate(username, endDate);
+
+            JOptionPane.showMessageDialog(this, "Member end date set!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+        }catch(DateTimeParseException el){
+            JOptionPane.showMessageDialog(this, "EndDate should be in format DD-MM-YYYY", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Setting date Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
         // Send notifications when subscription of member ends
         private void handleSendNotifications() {
 
            // Mock implementation assuming end of subscription is checked
            try {
                 loggedInAdmin.notifyMemberEndDate();
-            
+
                 StringBuilder notifications = new StringBuilder("Notifications:\n\n");
 
                 String[] notificationsArray = loggedInAdmin.getNotificationsArray();
@@ -974,6 +1019,7 @@ public class Main extends JFrame {
             JButton myNotifications = createStyledButton("View Notifications");
             JButton myReports = createStyledButton("View Reports");
             JButton myInfoButton = createStyledButton("My Info");
+            JButton viewBill = createStyledButton("View Bill");
 
 
             viewEndDateButton.addActionListener(e -> handleViewEndDate());
@@ -984,6 +1030,7 @@ public class Main extends JFrame {
             myInfoButton.addActionListener(e -> getMYInfo(loggedInMember));
             myNotifications.addActionListener(e -> handleViewNotifications());
             myReports.addActionListener(e -> getMYReports());
+            viewBill.addActionListener(e -> handleViewBill());
 
 
             buttonPanel.add(viewEndDateButton);
@@ -991,6 +1038,7 @@ public class Main extends JFrame {
             buttonPanel.add(viewScheduleButton);
             buttonPanel.add(myReports);
             buttonPanel.add(myNotifications);
+            buttonPanel.add(viewBill);
             buttonPanel.add(myInfoButton);
             buttonPanel.add(updateInfoButton);
             buttonPanel.add(logoutButton);
@@ -1018,6 +1066,19 @@ public class Main extends JFrame {
            } catch (Exception e) {
                JOptionPane.showMessageDialog(this, e.getMessage(), "View End Date Failed", JOptionPane.ERROR_MESSAGE);
            }
+        }
+
+        private void handleViewBill() {
+            try{
+                String bill = loggedInMember.getRenewPrice();
+                if(bill.equals("null")){
+                    JOptionPane.showMessageDialog(this, "You don't have a renew bill yet", "Renew Bill", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+                JOptionPane.showMessageDialog(this, "Your renew bill is: " + bill, "Renew Bill", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "View bill Failed", JOptionPane.ERROR_MESSAGE);
+            }
         }
 
         private void getMYReports() {

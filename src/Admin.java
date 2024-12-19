@@ -36,7 +36,7 @@ public class Admin extends User {
         String[] member = UserManipulations.lookup("member", username);
 
         if (member != null) {
-            member[8] = report;
+            member[8] = report + ",";
 
             // updates report in csv
             int line = UserManipulations.lineLookup("member", username);
@@ -145,7 +145,8 @@ public class Admin extends User {
         }
         int line = UserManipulations.lineLookup("member", username);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-M-yyyy"); // Corrected pattern
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); // Corrected pattern
+
         // Use getter for endDate
         if (EndDate == "null" || EndDate.isEmpty()) {
             return; // If endDate is null (missing), return false
@@ -154,9 +155,12 @@ public class Admin extends User {
         try {
             LocalDate endDateFormatted = LocalDate.parse(EndDate, formatter);
             LocalDate currentDate = LocalDate.now();
+
+            String date = endDateFormatted.format(formatter);
+
             // Return true if endDate is not before currentDate
             if (!endDateFormatted.isBefore(currentDate)) {
-                userData[3] = endDateFormatted.toString();
+                userData[3] = date;
                 UserManipulations.updater("member", userData, line);
             } else {
                 throw new IllegalArgumentException("enter a proper end date in the future with proper date formatting d-M-yyyy");
@@ -360,7 +364,7 @@ public class Admin extends User {
         }
 
         for (int i = 0; i < membersUsername.size(); i++) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             try {
                 LocalDate endDateFormatted = LocalDate.parse(membersDates.get(i), formatter);
                 LocalDate currentDate = LocalDate.now();
